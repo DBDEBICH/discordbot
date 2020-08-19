@@ -1,7 +1,20 @@
 import discord
 from discord import utils
 
-import config
+POST_ID = '745618105983828008' #post id to read reactions from
+
+#roles list according to emotes
+ROLES = {
+	'💙': '745583364068737076',
+	'💚': '745634951852195961',
+	'💛': '745634956063146085',
+	'💜': '745634959422914632'
+}
+
+#exclude this roles from counting
+EXCROLES = ()
+
+MAX_ROLES_PER_USER = 5 #max ammount of roles a user can have
 
 class MyClient(discord.Client):
 	async def on_ready(self):
@@ -14,15 +27,11 @@ class MyClient(discord.Client):
 
 		try:
 			emoji = str(payload.emoji) # эмоджик который выбрал юзер
-			role = utils.get(message.guild.roles, id=config.ROLES[emoji]) # объект выбранной роли (если есть)
-		
-			if(len([i for i in member.roles if i.id not in config.EXCROLES]) <= config.MAX_ROLES_PER_USER):
-				await member.add_roles(role)
-				print('[SUCCESS] User {0.display_name} has been granted with role {1.name}'.format(member, role))
-			else:
-				await message.remove_reaction(payload.emoji, member)
-				print('[ERROR] Too many roles for user {0.display_name}'.format(member))
-		
+			role = utils.get(message.guild.roles, id=int(ROLES[emoji])) # объект выбранной роли (если есть)
+			
+			await member.add_roles(role)
+			print('[SUCCESS] User {0.display_name} has been granted with role {1.name}'.format(member, role))
+			
 		except KeyError as e:
 			print('[ERROR] KeyError, no role found for ' + emoji)
 		except Exception as e:
@@ -35,7 +44,7 @@ class MyClient(discord.Client):
 
 		try:
 			emoji = str(payload.emoji) # эмоджик который выбрал юзер
-			role = utils.get(message.guild.roles, id=config.ROLES[emoji]) # объект выбранной роли (если есть)
+			role = utils.get(message.guild.roles, id=int(ROLES[emoji])) # объект выбранной роли (если есть)
 
 			await member.remove_roles(role)
 			print('[SUCCESS] Role {1.name} has been remove for user {0.display_name}'.format(member, role))
@@ -45,15 +54,5 @@ class MyClient(discord.Client):
 		except Exception as e:
 			print(repr(e))
 
-	async def on_message(self, message):
-		if message.author == client.user:
-			return
-
-		if message.content.startswith('$hello'):
-			await message.channel.send('Hello!')
-
-		if message.content.startswith('$role'):
-			await message.channel.send('just pick emoji for it')
-
 client = MyClient()
-client.run('NzQ1NTg1Nzc2NTQ0NDQ4NTM0.Xzz63Q.RY2-z-nA3HvhYPTOeQRcyeFAiYk')
+client.run('token')
